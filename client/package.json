@@ -1,0 +1,13 @@
+{
+	"name": "invoice-cli",
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"start": "tsx cli.ts"
+	},
+	"devDependencies": {
+		"tsx": "^4.7.1",
+		"typescript": "^5.3.3"
+	}
+}
+
