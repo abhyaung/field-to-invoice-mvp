@@ -1,21 +1,29 @@
+import json
+
+import httpx
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-from typing import List
-import httpx
-import json
 
 app = FastAPI(title="Field-to-Invoice AI Extractor")
 
 #-- Data Models --
 class JobSummary(BaseModel):
-    text: str = Field(..., example="Replaced a 3/4-inch copper valve, fixed the thermostat wiring. Parts cost 45, labor is 120 and hour for 2 hours.")
+    text: str = Field(
+        ...,
+        json_schema_extra={
+            "example": (
+                "Replaced a 3/4-inch copper valve, fixed the thermostat wiring. "
+                "Parts cost 45, labor is 120 an hour for 2 hours."
+            )
+        },
+    )
 
 class InvoiceItem(BaseModel):
     description: str
     cost: float
 
 class Invoice(BaseModel):
-    parts_used: List[InvoiceItem]
+    parts_used: list[InvoiceItem]
     labor_hours: float
     total_parts_cost: float
     total_labor_cost: float
@@ -67,11 +75,11 @@ async def extract_invoice(job: JobSummary):
             return validated_invoice
 
         except httpx.RequestError as e:
-            raise HTTPExeption(status_code=503, detail=f"Ollama connection failed: {str(e)}")
-        except json.JSONDecodeError:
-            raise HTTPException(status_code=500, detail="LLM failed to return valid JSON.")
+            raise HTTPException(status_code=503, detail=f"Ollama connection failed: {str(e)}") from e
+        except json.JSONDecodeError as e:
+            raise HTTPException(status_code=500, detail="LLM failed to return valid JSON.") from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
 if __name__ == "__main__":
     import uvicorn
