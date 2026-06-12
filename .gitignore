@@ -6,6 +6,8 @@ backend/__pycache__/
 # Node/TypeScript
 client/node_modules/
 client/dist/
+web/node_modules/
+web/dist/
 
 # OS
 .DS_Store
